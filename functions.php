@@ -41,11 +41,12 @@ function createUsersTable() {
     $conn = connectDB();
     // La columna 'note' se añade con un valor predeterminado si el usuario no tiene una.
     // PASSWORD_HASH: En producción, usar esto con password_verify.
+    // CORRECCIÓN: Se eliminó DEFAULT '' para el tipo TEXT, ya que MySQL no lo permite directamente.
     $sql = "CREATE TABLE IF NOT EXISTS users (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 username VARCHAR(255) NOT NULL UNIQUE,
                 password VARCHAR(255) NOT NULL,
-                note TEXT DEFAULT ''
+                note TEXT
             )";
     if ($conn->query($sql) === TRUE) {
         //echo "Tabla 'users' creada exitosamente o ya existe.<br>";
