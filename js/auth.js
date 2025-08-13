@@ -28,6 +28,7 @@ export const saveUsers = (users) => {
 
 /**
  * Registra un nuevo usuario en la "base de datos" (localStorage).
+ * Inicializa una nota vacía para el nuevo usuario.
  * @param {string} username - El nombre de usuario a registrar.
  * @param {string} password - La contraseña del usuario (ATENCIÓN: NO SEGURO PARA PRODUCCIÓN).
  * @returns {object|null} El objeto de usuario si el registro es exitoso, o null si el usuario ya existe.
@@ -42,7 +43,7 @@ export const registerUser = (username, password) => {
 
     // ADVERTENCIA DE SEGURIDAD: En una aplicación real, las contraseñas DEBEN ser hasheadas y salteadas.
     // NUNCA las almacenes en texto plano como aquí.
-    const newUser = { username: username, password: password };
+    const newUser = { username: username, password: password, note: '' }; // Añadir 'note' vacía
     users.push(newUser);
     saveUsers(users);
     return newUser;
@@ -59,4 +60,22 @@ export const loginUser = (username, password) => {
     // Buscar usuario por nombre y contraseña (texto plano en esta demo)
     const foundUser = users.find(user => user.username === username && user.password === password);
     return foundUser || null;
+};
+
+/**
+ * Actualiza la nota de un usuario específico en la "base de datos" (localStorage).
+ * @param {string} username - El nombre de usuario cuya nota se va a actualizar.
+ * @param {string} newNote - La nueva nota a guardar para el usuario.
+ * @returns {object|null} El objeto de usuario actualizado si se encontró, o null si no.
+ */
+export const updateUserNote = (username, newNote) => {
+    const users = getUsers();
+    const userIndex = users.findIndex(user => user.username === username);
+
+    if (userIndex !== -1) {
+        users[userIndex].note = newNote; // Actualizar la nota del usuario
+        saveUsers(users);
+        return users[userIndex]; // Devolver el usuario actualizado
+    }
+    return null; // Usuario no encontrado
 };

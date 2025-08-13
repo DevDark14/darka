@@ -1,6 +1,6 @@
 // js/main.js
 // Importar funciones de los módulos auth.js y ui.js
-import { getUsers, saveUsers, registerUser, loginUser } from './auth.js';
+import { getUsers, saveUsers, registerUser, loginUser, updateUserNote } from './auth.js'; // Importar updateUserNote
 import { showUIMessage, copyToClipboard } from './ui.js';
 
 // Asegurarse de que el DOM esté completamente cargado antes de ejecutar el script
@@ -20,13 +20,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const loginMessage = document.getElementById('login-message');
     const registerMessage = document.getElementById('register-message');
+    
+    // Referencias para la nueva funcionalidad del dashboard
+    const userNoteInput = document.getElementById('user-note-input');
+    const saveNoteButton = document.getElementById('save-note-button');
+    const displayNote = document.getElementById('display-note');
+    const dashboardMessage = document.getElementById('dashboard-message');
+
     const copyMessage = document.getElementById('copy-message'); // From welcome section
 
     const welcomeUsernameSpan = document.getElementById('welcome-username');
     const contactLink = document.getElementById('contactLink');
     const logoutButton = document.getElementById('logout-button');
     const showRegisterButton = document.getElementById('show-register');
-    const showLoginButton = document.getElementById('show-login');
+    const showLoginButton = document.getElementById('show-login'); // Corregido: Referencia correcta
 
     // --- Variables de estado de la aplicación ---
     let currentUser = null; // Almacena el usuario actualmente logueado
@@ -50,6 +57,19 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 targetSection.classList.add('active'); // Add 'active' for transition
             }, 10); 
+        }
+    };
+
+    /**
+     * Carga la nota del usuario actual en el área de texto y la muestra.
+     */
+    const loadUserNote = () => {
+        if (currentUser && currentUser.note !== undefined) {
+            userNoteInput.value = currentUser.note;
+            displayNote.textContent = currentUser.note;
+        } else {
+            userNoteInput.value = '';
+            displayNote.textContent = 'No hay nota guardada.';
         }
     };
 
@@ -91,15 +111,36 @@ document.addEventListener('DOMContentLoaded', () => {
             welcomeUsernameSpan.textContent = currentUser.username; // Display username
             showSection('welcome-section'); // Go to welcome section
             loginForm.reset(); // Clear the form
+            loadUserNote(); // Cargar la nota del usuario al iniciar sesión
             showUIMessage(loginMessage, '¡Inicio de sesión exitoso!', true); // Opcional: mostrar mensaje aquí o no.
         } else {
             showUIMessage(loginMessage, 'Usuario o contraseña incorrectos.', false);
         }
     });
 
+    // --- Lógica de Guardar Nota en Dashboard ---
+    saveNoteButton.addEventListener('click', () => {
+        if (currentUser) {
+            const newNote = userNoteInput.value.trim();
+            const updatedUser = updateUserNote(currentUser.username, newNote); // Usa la función importada
+
+            if (updatedUser) {
+                currentUser = updatedUser; // Actualizar el usuario actual con la nota guardada
+                displayNote.textContent = currentUser.note; // Actualizar la nota mostrada
+                showUIMessage(dashboardMessage, '¡Nota guardada exitosamente!', true);
+            } else {
+                showUIMessage(dashboardMessage, 'Error al guardar la nota. Usuario no encontrado.', false);
+            }
+        } else {
+            showUIMessage(dashboardMessage, 'No has iniciado sesión.', false);
+        }
+    });
+
     // --- Lógica de Logout ---
     logoutButton.addEventListener('click', () => {
         currentUser = null; // Clear logged in user
+        userNoteInput.value = ''; // Limpiar campo de nota
+        displayNote.textContent = ''; // Limpiar nota mostrada
         showSection('login-section'); // Go back to login section
     });
 

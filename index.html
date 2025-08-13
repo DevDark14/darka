@@ -82,7 +82,8 @@
             font-weight: bold;
         }
         input[type="text"],
-        input[type="password"] {
+        input[type="password"],
+        textarea { /* Añadido textarea aquí */
             width: calc(100% - 20px);
             padding: 0.75rem 10px;
             border: 1px solid #444;
@@ -92,9 +93,12 @@
             font-size: 1rem;
             outline: none;
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            resize: vertical; /* Permite redimensionar verticalmente */
+            min-height: 80px; /* Altura mínima para el textarea */
         }
         input[type="text"]:focus,
-        input[type="password"]:focus {
+        input[type="password"]:focus,
+        textarea:focus {
             border-color: #ff3f3f;
             box-shadow: 0 0 0 3px rgba(255, 63, 63, 0.3);
         }
@@ -152,6 +156,30 @@
         }
         #copy-message.show {
             opacity: 1;
+        }
+
+        /* Estilos específicos para el área de notas del dashboard */
+        .note-section {
+            background-color: #2a2a2a;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-top: 1.5rem;
+            text-align: left;
+        }
+        .note-section h3 {
+            color: #ff3f3f;
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+        }
+        #display-note {
+            background-color: #333;
+            color: #eee;
+            padding: 1rem;
+            border-radius: 8px;
+            min-height: 100px;
+            white-space: pre-wrap; /* Mantiene saltos de línea y espacios */
+            word-wrap: break-word; /* Rompe palabras largas */
+            margin-bottom: 1rem;
         }
 
         /* Responsive adjustments */
@@ -218,11 +246,19 @@
         <div id="welcome-section" class="section-container hidden">
             <h2 class="text-2xl font-bold text-white mb-6">¡Hola, <span id="welcome-username"></span>!</h2>
             <p>Bienvenido de nuevo a DarkAbout.</p>
-            <p>Tu espacio online, sencillo y directo.</p>
             
-            <!-- El enlace con el correo electrónico -->
-            <a id="contactLink" href="mailto:contacto@darkabout.xyz">Contáctanos</a>
-            <!-- Elemento para mostrar el mensaje de confirmación -->
+            <!-- Nueva sección para la nota personal del usuario -->
+            <div class="note-section">
+                <h3>Tu Nota Personal</h3>
+                <div id="display-note"></div> <!-- Para mostrar la nota guardada -->
+                <textarea id="user-note-input" placeholder="Escribe tu nota aquí..." class="mt-4"></textarea>
+                <button id="save-note-button" class="mt-4">Guardar Nota</button>
+                <div id="dashboard-message" class="message"></div>
+            </div>
+
+            <!-- El enlace con el correo electrónico (mantenido) -->
+            <a id="contactLink" href="mailto:contacto@darkabout.xyz" class="mt-8">Contáctanos</a>
+            <!-- Elemento para mostrar el mensaje de confirmación (mantenido) -->
             <span id="copy-message"></span>
 
             <button type="button" id="logout-button" class="mt-8">Cerrar Sesión</button>
