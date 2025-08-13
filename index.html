@@ -2,48 +2,138 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DarkAbout</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Estilos base utilizando Tailwind CSS para una mejor adaptabilidad */
         body {
-            background-color: #121212;
-            color: #eee;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', sans-serif; /* Usamos Inter como se sugiere */
+            background-color: #121212; /* Fondo oscuro */
+            color: #eee; /* Color de texto claro */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh; /* Asegura que ocupe al menos toda la altura de la vista */
             margin: 0;
+            padding: 20px; /* Añade un poco de padding para evitar que el contenido toque los bordes */
+            box-sizing: border-box; /* Incluye padding en el tamaño total */
         }
         h1 {
             color: #ff3f3f;
-            font-size: 3rem;
+            font-size: 3rem; /* Tamaño de fuente para el título */
             margin-bottom: 0.5rem;
+            text-align: center; /* Centra el texto en pantallas pequeñas */
         }
         p {
             font-size: 1.3rem;
             color: #bbb;
+            text-align: center; /* Centra el texto en pantallas pequeñas */
+            margin-bottom: 1.5rem; /* Espacio debajo del párrafo */
         }
         a {
             color: #ff3f3f;
             text-decoration: none;
-            margin-top: 1.5rem;
             font-weight: bold;
             border: 2px solid #ff3f3f;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
+            padding: 0.75rem 1.5rem; /* Ajusta el padding para un mejor tamaño de botón */
+            border-radius: 9999px; /* Bordes completamente redondeados con Tailwind */
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease; /* Añade transición a transform */
+            display: inline-block; /* Permite transformaciones */
         }
         a:hover {
             background-color: #ff3f3f;
             color: #121212;
+            transform: translateY(-2px); /* Pequeño efecto de elevación al pasar el ratón */
+        }
+        /* Estilos para el mensaje de confirmación */
+        #copy-message {
+            margin-top: 1rem;
+            color: #4CAF50; /* Un verde vibrante para el éxito */
+            font-weight: bold;
+            opacity: 0; /* Inicialmente oculto */
+            transition: opacity 0.5s ease-in-out; /* Transición suave para aparecer/desaparecer */
+            font-size: 1rem;
+        }
+        #copy-message.show {
+            opacity: 1; /* Visible cuando tiene la clase 'show' */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2.2rem; /* Reduce el tamaño del título en móviles */
+            }
+            p {
+                font-size: 1rem; /* Reduce el tamaño del párrafo en móviles */
+            }
+            a {
+                padding: 0.6rem 1.2rem; /* Ajusta el padding del botón en móviles */
+            }
         }
     </style>
 </head>
 <body>
     <h1>Bienvenido a DarkAbout</h1>
     <p>Tu espacio online, sencillo y directo.</p>
-    <a href="mailto:contacto@darkabout.xyz">Contáctanos</a>
+    <!-- El enlace con el correo electrónico -->
+    <a id="contactLink" href="mailto:contacto@darkabout.xyz">Contáctanos</a>
+    <!-- Elemento para mostrar el mensaje de confirmación -->
+    <span id="copy-message"></span>
+
+    <script>
+        // Asegurarse de que el DOM esté completamente cargado antes de ejecutar el script
+        document.addEventListener('DOMContentLoaded', () => {
+            // Obtener referencias a los elementos del DOM
+            const contactLink = document.getElementById('contactLink');
+            const copyMessage = document.getElementById('copy-message');
+
+            // Añadir un "event listener" al enlace de contacto
+            contactLink.addEventListener('click', (event) => {
+                // Prevenir el comportamiento por defecto del enlace (abrir el cliente de correo)
+                event.preventDefault();
+
+                // Obtener el correo electrónico del atributo href del enlace
+                const emailAddress = contactLink.getAttribute('href').replace('mailto:', '');
+
+                // Crear un elemento de texto temporal para copiar el contenido al portapapeles
+                const tempInput = document.createElement('textarea');
+                tempInput.value = emailAddress;
+                document.body.appendChild(tempInput);
+                tempInput.select(); // Seleccionar el texto dentro del textarea
+                tempInput.setSelectionRange(0, 99999); /* Para dispositivos móviles */
+
+                try {
+                    // Ejecutar el comando de copia al portapapeles
+                    // document.execCommand('copy') es una API legacy, pero es más compatible en entornos de iframe.
+                    const successful = document.execCommand('copy');
+                    const msg = successful ? '¡Correo copiado!' : 'Error al copiar el correo.';
+                    
+                    // Mostrar el mensaje de confirmación
+                    copyMessage.textContent = msg;
+                    copyMessage.classList.add('show'); // Añadir clase para hacer visible el mensaje
+
+                    // Ocultar el mensaje después de 3 segundos
+                    setTimeout(() => {
+                        copyMessage.classList.remove('show'); // Quitar clase para ocultar el mensaje
+                        copyMessage.textContent = ''; // Limpiar el texto
+                    }, 3000);
+                } catch (err) {
+                    console.error('No se pudo copiar el texto: ', err);
+                    copyMessage.textContent = 'Error al copiar el correo.';
+                    copyMessage.classList.add('show');
+                    setTimeout(() => {
+                        copyMessage.classList.remove('show');
+                        copyMessage.textContent = '';
+                    }, 3000);
+                } finally {
+                    // Eliminar el elemento temporal del DOM
+                    document.body.removeChild(tempInput);
+                }
+            });
+        });
+    </script>
 </body>
 </html>
