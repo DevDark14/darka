@@ -5,7 +5,7 @@ require_once 'functions.php'; // Incluye el archivo de funciones
 $errorMessage = '';
 $successMessage = '';
 
-// Si el usuario ya está logueado, redirige al dashboard
+// Si el usuario ya está logueado, redirige al 1dashboard
 if (isAuthenticated()) {
     redirectTo('dashboard.php');
 }
