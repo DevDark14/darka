@@ -2,12 +2,18 @@
 // functions.php
 
 // Función para conectar a la base de datos MySQL.
-// Utiliza la variable de entorno CLEARDB_DATABASE_URL proporcionada por Heroku.
+// Utiliza la variable de entorno JAWSDB_URL (o DATABASE_URL) proporcionada por Heroku.
 function connectDB() {
-    $url = getenv("CLEARDB_DATABASE_URL"); // Obtiene la URL de la base de datos de Heroku
+    // Intentar obtener la URL de JawsDB
+    $url = getenv("JAWSDB_URL"); 
+
+    // Si JAWSDB_URL no está configurada, probar con DATABASE_URL (otra común en Heroku)
     if (empty($url)) {
-        // En desarrollo local, puedes definir tus propias credenciales aquí
-        // O configurar una base de datos local (ej. XAMPP MySQL)
+        $url = getenv("DATABASE_URL");
+    }
+
+    // Si ninguna variable de entorno de Heroku está presente, usar credenciales locales
+    if (empty($url)) {
         $host = '127.0.0.1'; // Host para XAMPP/local
         $user = 'root'; // Tu usuario local de MySQL
         $password = 'Dan19060..'; // ¡TU CONTRASEÑA LOCAL!
@@ -18,7 +24,8 @@ function connectDB() {
         $host = $dbparts['host'];
         $user = $dbparts['user'];
         $password = $dbparts['pass'];
-        $db = ltrim($dbparts['path'],'/');
+        // Eliminar la barra inicial del path de la DB
+        $db = ltrim($dbparts['path'],'/'); 
     }
 
     // Conexión usando MySQLi (orientado a objetos)
@@ -26,6 +33,8 @@ function connectDB() {
 
     // Verificar la conexión
     if ($conn->connect_error) {
+        // Si la conexión falla, mostrar el error (en desarrollo) y terminar la ejecución.
+        // En producción, preferirías registrar el error y mostrar una página amigable.
         die("Error de conexión a la base de datos: " . $conn->connect_error);
     }
     return $conn;
