@@ -1,6 +1,10 @@
 <?php
 session_start(); // Siempre inicia la sesión al principio
-require_once 'functions.php'; // Incluye el archivo de funciones
+
+// Incluye el archivo de funciones desde la nueva ubicación en la carpeta 'core'.
+// __DIR__ se refiere al directorio actual (public/), y ../ sube un nivel para ir a la raíz del proyecto,
+// y luego entra en 'core/functions.php'.
+require_once __DIR__ . '/../core/functions.php';
 
 $currentUser = isAuthenticated();
 $dashboardMessage = '';
@@ -26,9 +30,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_note_submit'])) 
 
 // Lógica para cerrar sesión
 if (isset($_GET['logout'])) {
-    session_unset();   // Elimina todas las variables de sesión
-    session_destroy(); // Destruye la sesión
-    redirectTo('login.php'); // Redirige al login
+    session_unset();    // Elimina todas las variables de sesión
+    session_destroy();  // Destruye la sesión
+    redirectTo('login.php'); // Redirige al login.php, que también está en 'public/'
 }
 
 // Configura la nota a mostrar
@@ -74,7 +78,7 @@ $userNoteInputValue = $currentUser['note'] ?? ''; // Valor para el textarea
     <div class="section-container">
         <h2 class="text-2xl font-bold text-white mb-6">¡Hola, <?php echo htmlspecialchars($currentUser['username']); ?>!</h2>
         <p>Bienvenido de nuevo a DarkAbout.</p>
-        
+
         <div class="note-section">
             <h3>Tu Nota Personal</h3>
             <div id="display-note"><?php echo htmlspecialchars($displayNote); ?></div>
@@ -108,7 +112,7 @@ $userNoteInputValue = $currentUser['note'] ?? ''; // Valor para el textarea
                     event.preventDefault(); // Prevenir el comportamiento por defecto del enlace
 
                     const emailAddress = contactLink.getAttribute('href').replace('mailto:', '');
-                    
+
                     // Intenta usar la API moderna del portapapeles
                     if (navigator.clipboard && navigator.clipboard.writeText) {
                         navigator.clipboard.writeText(emailAddress)

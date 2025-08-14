@@ -1,11 +1,15 @@
 <?php
 session_start(); // Siempre inicia la sesión al principio
-require_once 'functions.php'; // Incluye el archivo de funciones
+
+// Incluye el archivo de funciones desde la nueva ubicación en la carpeta 'core'.
+// __DIR__ se refiere al directorio actual (public/), y ../ sube un nivel para ir a la raíz del proyecto,
+// y luego entra en 'core/functions.php'.
+require_once __DIR__ . '/../core/functions.php';
 
 $errorMessage = '';
 $successMessage = '';
 
-// Si el usuario ya está logueado, redirige al 1dashboard
+// Si el usuario ya está logueado, redirige al dashboard
 if (isAuthenticated()) {
     redirectTo('dashboard.php');
 }
@@ -18,11 +22,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submit'])) {
     if (empty($username) || empty($password)) {
         $errorMessage = 'Por favor, rellena todos los campos.';
     } else {
+        // ADVERTENCIA DE SEGURIDAD: En producción, hashearías la contraseña antes de pasarla a registerNewUser.
+        // Ejemplo: $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        // Y luego llamarías a registerNewUser($username, $hashed_password);
         if (registerNewUser($username, $password)) {
             $successMessage = '¡Registro exitoso! Ya puedes iniciar sesión.';
             // Opcional: limpiar los campos del formulario después del registro exitoso
-            $username = '';
-            $password = '';
+            $username = ''; // Limpia el campo de usuario
+            // No limpiamos $password por seguridad, aunque ya se procesó.
         } else {
             $errorMessage = 'Este usuario ya existe.';
         }
@@ -84,5 +91,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submit'])) {
             <button type="button" onclick="window.location.href='login.php'">Volver a Login</button>
         </form>
     </div>
+
+    <!-- JavaScript para que los mensajes de PHP tengan un fade-out -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const phpMessages = document.querySelectorAll('.message');
+            phpMessages.forEach(msg => {
+                if (msg.textContent.trim() !== '') {
+                    setTimeout(() => {
+                        msg.style.opacity = '0';
+                        setTimeout(() => { msg.style.display = 'none'; }, 500); // Espera la transición antes de ocultar
+                    }, 3000);
+                }
+            });
+        });
+    </script>
 </body>
 </html>
